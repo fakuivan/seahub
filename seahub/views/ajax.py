@@ -30,7 +30,7 @@ from seahub.forms import RepoRenameDirentForm
 from seahub.options.models import UserOptions, CryptoOptionNotSetError
 from seahub.notifications.models import UserNotification
 from seahub.notifications.views import add_notice_from_info
-from seahub.share.models import UploadLinkShare, ExtraSharePermission
+from seahub.share.models import UploadLinkShare, ExtraSharePermission, ExtraGroupsSharePermission
 from seahub.signals import upload_file_successful
 from seahub.views import get_unencry_rw_repos_by_user, \
     get_diff, check_folder_permission
@@ -311,7 +311,15 @@ def list_lib_dir(request, repo_id):
             logger.error(e)
 
     # for shared repo
-    result["is_admin"] = ExtraSharePermission.objects.get_user_permission(repo_id, username) == PERMISSION_ADMIN
+    op = request.GET.get("type", "")
+    if op.split('/')[0] == 'group':
+        groups = [str(e.id) for e in get_groups_by_user(request)]
+        temp_res = (set(groups) & set(ExtraGroupsSharePermission.objects.get_admin_groups(repo_id)))
+        result["is_admin"] = True if temp_res else False
+    elif op == 'shared-libs':
+        result["is_admin"] = ExtraSharePermission.objects.get_user_permission(repo_id, username) == PERMISSION_ADMIN
+    else:
+        result["is_admin"] = False
 
     result["is_virtual"] = repo.is_virtual
     result["repo_name"] = repo.name

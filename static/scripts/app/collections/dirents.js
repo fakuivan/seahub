@@ -10,7 +10,7 @@ define([
         model: Dirent,
 
         url: function () {
-            return Common.getUrl({name: 'list_lib_dir', repo_id: this.repo_id});
+            return Common.getUrl({name: 'list_lib_dir', repo_id: this.repo_id})+"?type="+this.category;
         },
 
         initialize: function() {

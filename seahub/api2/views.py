@@ -46,7 +46,7 @@ from seahub.avatar.templatetags.group_avatar_tags import api_grp_avatar_url, \
         grp_avatar
 from seahub.base.accounts import User
 from seahub.base.models import UserStarredFiles, DeviceToken
-from seahub.share.models import ExtraSharePermission
+from seahub.share.models import ExtraSharePermission, ExtraGroupsSharePermission
 from seahub.base.templatetags.seahub_tags import email2nickname, \
     translate_seahub_time, translate_commit_desc_escape, \
     email2contact_email
@@ -3997,6 +3997,8 @@ class GroupRepos(APIView):
             if e not in nickname_dict:
                 nickname_dict[e] = email2nickname(e)
 
+        admin_repos = ExtraGroupsSharePermission.objects.\
+                get_repos_with_admin_permission(group.id)
         repos_json = []
         for r in repos:
             repo = {
@@ -4015,6 +4017,7 @@ class GroupRepos(APIView):
                 "modifier_email": r.last_modifier,
                 "modifier_contact_email": contact_email_dict.get(r.last_modifier, ''),
                 "modifier_name": nickname_dict.get(r.last_modifier, ''),
+                "is_admin": str(r.id) in admin_repos,
             }
             repos_json.append(repo)
 
@@ -4034,7 +4037,10 @@ class GroupRepo(APIView):
         username = request.user.username
         group_id = group.id
 
-        if not group.is_staff and not seafile_api.is_repo_owner(username, repo_id):
+        groups = [str(e.id) for e in get_groups_by_user(request)]
+        if not group.is_staff and \
+           not seafile_api.is_repo_owner(username, repo_id) and \
+           not (set(groups) & (ExtraGroupsSharePermission.objects.get_admin_groups(repo_id))):
             return api_error(status.HTTP_403_FORBIDDEN, 'Permission denied.')
 
         if seaserv.is_org_group(group_id):
@@ -4042,6 +4048,7 @@ class GroupRepo(APIView):
             seaserv.del_org_group_repo(repo_id, org_id, group_id)
         else:
             seafile_api.unset_group_repo(repo_id, group_id, username)
+        ExtraGroupsSharePermission.objects.delete_share_permission(repo_id, group_id)
 
         return HttpResponse(json.dumps({'success': True}), status=200,
                             content_type=json_content_type)

@@ -23,6 +23,7 @@ from seahub.utils import is_user_password_strong, \
     clear_token, get_system_admins, is_pro_version
 from seahub.utils.mail import send_html_email_with_dj_template, MAIL_PRIORITY
 from seahub.utils.licenseparse import user_number_over_limit
+from seahub.share.models import ExtraSharePermission, ExtraGroupsSharePermission
 
 try:
     from seahub.settings import CLOUD_MODE
@@ -277,6 +278,7 @@ class User(object):
         ccnet_api.remove_group_user(username)
         ccnet_api.remove_emailuser(source, username)
         Profile.objects.delete_profile_by_user(username)
+        ExtraSharePermission.objects.filter(share_to=username).delete()
 
         if settings.ENABLE_TERMS_AND_CONDITIONS:
             from termsandconditions.models import UserTermsAndConditions
