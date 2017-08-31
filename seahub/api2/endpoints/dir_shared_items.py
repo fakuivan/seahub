@@ -548,7 +548,7 @@ class DirSharedItemsEndpoint(APIView):
                     seaserv.remove_share(repo_id, repo_owner, shared_to)
                 else:
                     seafile_api.unshare_subdir_for_user(
-                            repo_id, path, reop_owner, shared_to)
+                            repo_id, path, repo_owner, shared_to)
 
             # Delete share permission at ExtraSharePermission table.
             if path == '/':

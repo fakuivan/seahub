@@ -196,7 +196,7 @@
     </td>
     <td><a href="#group/<%= group_id %>/lib/<%= id %>"><%- name %></a></td>
     <td class="alc">
-        <% if (show_admin) { %>
+        <% if (show_admin && app.pageOptions.is_pro) { %>
             <% if (is_admin) { %>
                 <a href="#" class="sf2-icon-share sf2-x repo-share-btn op-icon vh" title="{% trans "Share" %}" aria-label="{% trans "Share" %}"></a>
             <% } %>
@@ -1513,7 +1513,7 @@
         <th width="8%"><span class="sr-only">{% trans "Actions" %}</span><!--op--></th>
         <th width="14%">{% trans "Size" %}</th>
         <th width="18%"><a class="table-sort-op by-time" href="#">{% trans "Last Update" %} <span class="sort-icon icon-caret-up"></span></a></th>
-        <th width="16%">{% trans "Shared By" %}</th>
+        <th width="16%">{% trans "Owner" %}</th>
     </tr>
 </script>
 <script type="text/template" id="shared-repos-hd-mobile-tmpl">
