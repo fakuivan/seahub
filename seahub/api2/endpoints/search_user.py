@@ -1,5 +1,8 @@
 # Copyright (c) 2012-2016 Seafile Ltd.
+import os
+import sys
 import json
+import logging
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -22,12 +25,36 @@ from seahub.contacts.models import Contact
 from seahub.avatar.templatetags.avatar_tags import api_avatar_url
 
 from seahub.settings import ENABLE_GLOBAL_ADDRESSBOOK, \
-    ENABLE_SEARCH_FROM_LDAP_DIRECTLY
+    ENABLE_SEARCH_FROM_LDAP_DIRECTLY, SEARCH_IN_THE_SAME_INSTITUTION_ONLY
+
+
+logger = logging.getLogger(__name__)
 
 try:
     from seahub.settings import CLOUD_MODE
 except ImportError:
     CLOUD_MODE = False
+
+if SEARCH_IN_THE_SAME_INSTITUTION_ONLY:
+    try:
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        seafile_conf_dir = os.path.join(current_path, \
+                '../../../../../conf')
+        sys.path.append(seafile_conf_dir)
+        from seahub_custom_functions import filter_emails_by_institution
+    except ImportError as e:
+        logger.error(e)
+        def filter_emails_by_institution(institution_name, emails):
+            inst_users = [p.user for p in
+                    Profile.objects.filter(institution=institution_name)]
+
+            filtered_emails = []
+            for email in emails:
+                if email in inst_users:
+                    filtered_emails.append(email)
+
+            return filtered_emails
+
 
 class SearchUser(APIView):
     """ Search user from contacts/all users
@@ -112,6 +139,11 @@ class SearchUser(APIView):
         if include_self == 0 and username in email_result:
             # reomve myself
             email_result.remove(username)
+
+        if SEARCH_IN_THE_SAME_INSTITUTION_ONLY:
+            profile = Profile.objects.get_profile_by_user(request.user.username)
+            institution_name = profile.institution if profile else ''
+            email_result = filter_emails_by_institution(institution_name, email_result)
 
         # format user result
         try:

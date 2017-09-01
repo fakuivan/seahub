@@ -561,6 +561,7 @@ OFFICE_TEMPLATE_ROOT = os.path.join(MEDIA_ROOT, 'office-template')
 # Global AddressBook #
 #####################
 ENABLE_GLOBAL_ADDRESSBOOK = True
+SEARCH_IN_THE_SAME_INSTITUTION_ONLY = False
 
 #####################
 # Folder Permission #
