@@ -199,10 +199,12 @@
         <% if (show_admin && app.pageOptions.is_pro) { %>
             <% if (is_admin) { %>
                 <a href="#" class="sf2-icon-share sf2-x repo-share-btn op-icon vh" title="{% trans "Share" %}" aria-label="{% trans "Share" %}"></a>
+                <a href="#" class="sf2-icon-delete sf2-x cancel-share op-icon vh" title="{% trans "Unshare" %}" aria-label="{% trans "Unshare" %}"></a>
             <% } %>
-        <% } %>
-        <% if (is_staff || share_from_me || is_admin) { %>
-            <a href="#" class="sf2-icon-delete sf2-x cancel-share op-icon vh" title="{% trans "Unshare" %}" aria-label="{% trans "Unshare" %}"></a>
+        <% } else { %>
+            <% if (is_staff || share_from_me) { %>
+                <a href="#" class="sf2-icon-delete sf2-x cancel-share op-icon vh" title="{% trans "Unshare" %}" aria-label="{% trans "Unshare" %}"></a>
+            <% } %>
         <% } %>
     </td>
     <td><%= size_formatted %></td>
