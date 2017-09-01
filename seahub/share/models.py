@@ -221,11 +221,17 @@ class ExtraSharePermissionManager(models.Manager):
 
 class ExtraGroupsSharePermissionManager(models.Manager):
     def get_admin_groups(self, repo_id):
+        """ return admin groups in specific repo
+            e.g: ['23', '12']
+        """
         return super(ExtraGroupsSharePermissionManager, self).filter(
             repo_id=repo_id, permission='admin'
         ).values_list('group_id', flat=True)
 
     def get_repos_with_admin_permission(self, gid):
+        """ return admin repo in specific group
+            e.g: ['repo_id1', 'repo_id2']
+        """
         return super(ExtraGroupsSharePermissionManager, self).filter(
             group_id=gid, permission='admin'
         ).values_list('repo_id', flat=True)
