@@ -310,7 +310,7 @@ def list_lib_dir(request, repo_id):
         except Exception as e:
             logger.error(e)
 
-    # for shared repo
+    # Make a distinction between share to man and share to group.
     op = request.GET.get("type", "")
     if op.split('/')[0] == 'group':
         groups = [str(e.id) for e in get_groups_by_user(request)]

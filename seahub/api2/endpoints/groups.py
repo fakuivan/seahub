@@ -317,6 +317,7 @@ class Group(APIView):
                 return api_error(status.HTTP_403_FORBIDDEN, error_msg)
 
             remove_group_common(group_id, username, org_id=org_id)
+            # remove record of share to group when group deleted
             ExtraGroupsSharePermission.objects.filter(group_id=group_id).delete()
 
         except SearpcError as e:

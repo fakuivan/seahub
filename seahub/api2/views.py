@@ -3997,6 +3997,7 @@ class GroupRepos(APIView):
             if e not in nickname_dict:
                 nickname_dict[e] = email2nickname(e)
 
+        # Get repos that is admin permission in group.
         admin_repos = ExtraGroupsSharePermission.objects.\
                 get_repos_with_admin_permission(group.id)
         repos_json = []
@@ -4037,6 +4038,7 @@ class GroupRepo(APIView):
         username = request.user.username
         group_id = group.id
 
+        # only admin or owner can delete share record.
         groups = [str(e.id) for e in get_groups_by_user(request)]
         if not group.is_staff and \
            not seafile_api.is_repo_owner(username, repo_id) and \
