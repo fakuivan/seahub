@@ -277,7 +277,6 @@ class DirSharedItemsEndpoint(APIView):
                 if path == '/':
                     seafile_api.set_group_repo_permission(gid, repo.id, permission)
                 else:
-
                     seafile_api.update_share_subdir_perm_for_group(
                             repo_id, path, repo_owner, gid, permission)
 
@@ -374,7 +373,7 @@ class DirSharedItemsEndpoint(APIView):
                         repo_owner = seafile_api.get_org_repo_owner(repo_id)
                         # can't share to owner
                         if to_user == repo_owner:
-                            error_msg = "can not be shared to owner"
+                            error_msg = "Can not be shared with the owner"
                             return api_error(status.HTTP_400_BAD_REQUEST, error_msg)
 
                         if path == '/':
@@ -396,7 +395,7 @@ class DirSharedItemsEndpoint(APIView):
                         repo_owner = seafile_api.get_repo_owner(repo_id)
                         # can't share to owner
                         if to_user == repo_owner:
-                            error_msg = "can not be shared to owner"
+                            error_msg = "Can not be shared with the owner"
                             return api_error(status.HTTP_400_BAD_REQUEST, error_msg)
 
                         if path == '/':
