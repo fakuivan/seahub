@@ -201,16 +201,19 @@ class DirSharedItemsEndpoint(APIView):
 
         # if is not repo owner , nor is admin, nor is in admin groups, then return permission denied.
         groups = [str(e.id) for e in get_groups_by_user(request)]
-        if username != self.get_repo_owner(request, repo_id) and \
-           ExtraSharePermission.objects.get_user_permission(repo_id, username) != PERMISSION_ADMIN and not\
-           (set(groups) & set(ExtraGroupsSharePermission.objects.get_admin_groups(repo_id))):
+        is_admin = ExtraSharePermission.objects.get_user_permission\
+                (repo_id, username) == PERMISSION_ADMIN
+        in_groups_with_admin_permission = (set(groups) & set(\
+            ExtraGroupsSharePermission.objects.get_admin_groups(repo_id)))
+        if username != self.get_repo_owner(request, repo_id) and not\
+           is_admin and not in_groups_with_admin_permission:
             return api_error(status.HTTP_403_FORBIDDEN, 'Permission denied.')
 
         # recorded it if is extra permission
-        extra_share_permission = ""
-        if permission not in [PERMISSION_READ, PERMISSION_READ_WRITE]:
+        extra_share_permission = ''
+        if permission == PERMISSION_ADMIN:
             extra_share_permission = permission
-            permission = PERMISSION_READ_WRITE if permission == PERMISSION_ADMIN else PERMISSION_READ
+            permission = PERMISSION_READ_WRITE
 
         shared_to_user, shared_to_group = self.handle_shared_to_args(request)
         if shared_to_user:
@@ -305,10 +308,12 @@ class DirSharedItemsEndpoint(APIView):
 
         # if is not repo owner , nor is admin, nor is in admin groups, then return permission denied.
         groups = [str(e.id) for e in get_groups_by_user(request)]
-        if username != self.get_repo_owner(request, repo_id) and \
-           ExtraSharePermission.objects.\
-           get_user_permission(repo_id, username) != 'admin' and not\
-           (set(groups) & set(ExtraGroupsSharePermission.objects.get_admin_groups(repo_id))):
+        is_admin = ExtraSharePermission.objects.get_user_permission\
+                (repo_id, username) == PERMISSION_ADMIN
+        in_groups_with_admin_permission = (set(groups) & set(\
+            ExtraGroupsSharePermission.objects.get_admin_groups(repo_id)))
+        if username != self.get_repo_owner(request, repo_id) and not\
+           is_admin and not in_groups_with_admin_permission:
             return api_error(status.HTTP_403_FORBIDDEN, 'Permission denied.')
 
         permission = request.data.get('permission', PERMISSION_READ)
@@ -531,9 +536,12 @@ class DirSharedItemsEndpoint(APIView):
 
         # if is not repo owner , nor is admin, nor is in admin groups, then return permission denied.
         groups = [str(e.id) for e in get_groups_by_user(request)]
-        if username != self.get_repo_owner(request, repo_id) and \
-           ExtraSharePermission.objects.get_user_permission(repo_id, username) != PERMISSION_ADMIN and not \
-           (set(groups) & set(ExtraGroupsSharePermission.objects.get_admin_groups(repo_id))):
+        is_admin = ExtraSharePermission.objects.get_user_permission\
+                (repo_id, username) == PERMISSION_ADMIN
+        in_groups_with_admin_permission = (set(groups) & set(\
+            ExtraGroupsSharePermission.objects.get_admin_groups(repo_id)))
+        if username != self.get_repo_owner(request, repo_id) and not\
+           is_admin and not in_groups_with_admin_permission:
             return api_error(status.HTTP_403_FORBIDDEN, 'Permission denied.')
 
         shared_to_user, shared_to_group = self.handle_shared_to_args(request)
